@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carnet du vendeur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1F2D3D;
+    --ink-soft:#5C6B78;
+    --paper:#F7F3E9;
+    --paper-raised:#FFFDF8;
+    --line:#DDD3BE;
+    --gold:#A9791F;
+    --gold-bg:#F1E6CB;
+    --green:#2F6B45;
+    --green-bg:#E3EEE1;
+    --red:#A23B2C;
+    --red-bg:#F5E3DF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Mono', monospace;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:20px 16px 60px;}
+  h1,h2{font-family:'Fraunces',serif;font-weight:600;margin:0;}
+  .brand-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px;}
+  .brand-input{
+    font-family:'Fraunces',serif;font-weight:600;font-size:21px;color:var(--ink);
+    background:transparent;border:none;border-bottom:1px dashed transparent;padding:2px 0;width:100%;
+  }
+  .brand-input:focus{outline:none;border-bottom:1px dashed var(--gold);}
+  .subtitle{color:var(--ink-soft);font-size:12.5px;margin:0 0 20px;}
+
+  .hero{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 18px;
+    margin-bottom:22px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .hero-label{font-size:12px;color:var(--ink-soft);letter-spacing:.02em;}
+  .hero-value{font-family:'Fraunces',serif;font-weight:600;font-size:26px;color:var(--green);}
+  .hero-value.neg{color:var(--red);}
+
+  section{margin-bottom:26px;}
+  .section-title{font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .section-title .count{font-family:'IBM Plex Mono';font-size:12px;color:var(--ink-soft);font-weight:400;}
+
+  form{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px;
+  }
+  .field{margin-bottom:10px;}
+  .field label{display:block;font-size:11.5px;color:var(--ink-soft);margin-bottom:4px;}
+  .field input{
+    width:100%;
+    font-family:'IBM Plex Mono';
+    font-size:14px;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:#fff;
+    color:var(--ink);
+  }
+  .field input:focus{outline:none;border-color:var(--gold);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  .live-benefice{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--gold-bg);border-radius:6px;padding:8px 10px;margin:10px 0;font-size:13px;
+  }
+  .live-benefice .val{font-weight:500;color:var(--gold);}
+
+  button{
+    font-family:'IBM Plex Mono';font-size:13.5px;font-weight:500;
+    border:1px solid var(--ink);background:var(--ink);color:var(--paper-raised);
+    padding:10px 14px;border-radius:6px;width:100%;cursor:pointer;
+  }
+  button:active{transform:scale(0.99);}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
+
+  .empty{color:var(--ink-soft);font-size:13px;padding:14px 2px;}
+
+  .ledger-row{
+    border-bottom:1px solid var(--line);
+    padding:11px 2px;
+  }
+  .ledger-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .ledger-name{font-family:'Fraunces',serif;font-weight:600;font-size:14.5px;}
+  .ledger-qty{font-size:11.5px;color:var(--ink-soft);white-space:nowrap;}
+  .ledger-mid{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin-top:3px;}
+  .ledger-benef{color:var(--green);}
+  .ledger-actions{display:flex;gap:8px;margin-top:9px;}
+  .ledger-actions button{padding:7px 10px;font-size:12.5px;}
+  .btn-sell{flex:2;}
+  .btn-del{flex:1;background:transparent;color:var(--red);border:1px solid var(--red-bg);}
+
+  .sell-panel{
+    margin-top:9px;padding:10px;background:var(--paper);border-radius:6px;border:1px solid var(--line);
+  }
+  .sell-panel .row2{margin-bottom:8px;}
+
+  .sale-row{border-bottom:1px solid var(--line);padding:9px 2px;display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;}
+  .sale-left .name{font-family:'Fraunces',serif;font-weight:600;font-size:13.5px;}
+  .sale-left .date{color:var(--ink-soft);font-size:11px;}
+  .sale-right{text-align:right;}
+  .sale-right .benef{color:var(--green);font-weight:500;}
+
+  .error{color:var(--red);font-size:12px;margin-top:6px;display:none;}
+
+  .alert-banner{
+    background:var(--red-bg);color:var(--red);border-radius:8px;
+    padding:10px 12px;font-size:12.5px;margin-bottom:14px;
+  }
+
+  .stats-tabs{display:flex;gap:6px;margin-bottom:12px;}
+  .stats-tabs button{
+    flex:1;padding:8px 2px;font-size:11.5px;
+    background:var(--paper-raised);color:var(--ink-soft);
+    border:1px solid var(--line);
+  }
+  .stats-tabs button.active{background:var(--ink);color:var(--paper-raised);border-color:var(--ink);}
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .stat-card{background:var(--paper-raised);border:1px solid var(--line);border-radius:8px;padding:12px;}
+  .stat-card .label{font-size:11px;color:var(--ink-soft);margin-bottom:4px;}
+  .stat-card .value{font-family:'Fraunces',serif;font-weight:600;font-size:17px;}
+  .stat-card .sub{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+
+  .badge-low{
+    display:inline-block;background:var(--red-bg);color:var(--red);
+    font-size:10px;padding:2px 7px;border-radius:10px;margin-left:6px;white-space:nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand-row">
+    <input class="brand-input" id="boutique-nom" placeholder="Nom de la boutique" maxlength="40">
+  </div>
+  <p class="subtitle">Carnet de stock et de bénéfices</p>
+
+  <div class="hero">
+    <div>
+      <div class="hero-label">Bénéfice réalisé (ventes)</div>
+      <div class="hero-value" id="hero-total">0 FCFA</div>
+    </div>
+    <div style="text-align:right">
+      <div class="hero-label">Bénéfice potentiel du stock</div>
+      <div class="hero-value" id="hero-potentiel" style="color:var(--gold);">0 FCFA</div>
+    </div>
+  </div>
+
+  <div class="hero" style="margin-top:-14px;">
+    <div>
+      <div class="hero-label">Téléphones vendus</div>
+      <div class="hero-value" id="hero-qte-vendue" style="font-size:20px;">0</div>
+    </div>
+    <div style="text-align:right">
+      <div class="hero-label">Ventes enregistrées</div>
+      <div class="hero-value" id="hero-count" style="font-size:20px;">0</div>
+    </div>
+  </div>
+
+  <div class="alert-banner" id="alert-stock" style="display:none;"></div>
+
+  <section>
+    <div class="section-title">Statistiques</div>
+    <div class="stats-tabs" id="stats-tabs">
+      <button data-period="jour" class="active">Jour</button>
+      <button data-period="semaine">Semaine</button>
+      <button data-period="mois">Mois</button>
+      <button data-period="tout">Depuis le début</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">Bénéfice de la période</div>
+        <div class="value" id="stat-benef">0 FCFA</div>
+        <div class="sub" id="stat-count-ventes">0 vente(s)</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Produit le plus vendu</div>
+        <div class="value" id="stat-best" style="font-size:14px;">—</div>
+        <div class="sub" id="stat-best-qte"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Ajouter un produit</div>
+    <form id="form-produit">
+      <div class="field">
+        <label for="p-nom">Nom du produit</label>
+        <input id="p-nom" type="text" placeholder="Ex: Tecno Pop 10, 64 Go" required>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="p-achat">Prix d'achat (FCFA)</label>
+          <input id="p-achat" type="number" min="0" placeholder="62500" required>
+        </div>
+        <div class="field">
+          <label for="p-vente">Prix de vente (FCFA)</label>
+          <input id="p-vente" type="number" min="0" placeholder="70000" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="p-qte">Quantité en stock</label>
+        <input id="p-qte" type="number" min="1" placeholder="1" required>
+      </div>
+      <div class="live-benefice">
+        <span>Bénéfice par unité</span>
+        <span class="val" id="live-benef">0 FCFA</span>
+      </div>
+      <div class="error" id="form-error">Remplis tous les champs avec des valeurs valides.</div>
+      <button type="submit">Ajouter au stock</button>
+    </form>
+  </section>
+
+  <section>
+    <div class="section-title">Mon stock <span class="count" id="stock-count">(0)</span></div>
+    <div id="stock-list"></div>
+  </section>
+
+  <section>
+    <div class="section-title">Historique des ventes <span class="count" id="ventes-count">(0)</span></div>
+    <div id="ventes-list"></div>
+  </section>
+
+  <section>
+    <button class="ghost" id="btn-export">Exporter mes données (CSV)</button>
+  </section>
+
+  <section>
+    <button class="ghost" id="btn-reset" style="color:var(--red);border-color:var(--red-bg);">Tout réinitialiser (stock et ventes)</button>
+  </section>
+
+</div>
+
+<script>
+let produits = [];
+let ventes = [];
+let boutiqueNom = "Ma boutique";
+let openSellId = null;
+let statPeriod = 'jour';
+const LOW_STOCK = 3;
+
+function startOfWeek(date){
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = (day === 0 ? -6 : 1 - day);
+  d.setDate(d.getDate() + diff);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function inPeriod(iso, period){
+  const d = new Date(iso);
+  const now = new Date();
+  if(period === 'jour') return d.toDateString() === now.toDateString();
+  if(period === 'semaine') return startOfWeek(d).getTime() === startOfWeek(now).getTime();
+  if(period === 'mois') return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  return true;
+}
+
+function csvField(val){
+  const s = String(val);
+  if(s.includes(',') || s.includes('"') || s.includes('\n')){
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function exportCSV(){
+  const header = ['Date','Produit','Quantite','Prix achat','Prix vente','Benefice'];
+  const rows = ventes.map(v => [dateFr(v.date), v.produitNom, v.qte, v.achat, v.prixVente, v.benefice]);
+  const totalBenefice = ventes.reduce((s, v) => s + v.benefice, 0);
+  const totalRow = ['', '', '', '', 'TOTAL', totalBenefice];
+  const csv = [header.map(csvField).join(',')]
+    .concat(rows.map(r => r.map(csvField).join(',')))
+    .concat(['', totalRow.map(csvField).join(',')])
+    .join('\n');
+  const blob = new Blob(["\uFEFF" + csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ventes-' + boutiqueNom.replace(/\s+/g,'-') + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function fmt(n){
+  n = Math.round(Number(n) || 0);
+  return n.toLocaleString('fr-FR') + ' FCFA';
+}
+
+function loadAll(){
+  try{
+    const p = localStorage.getItem('cv-produits');
+    produits = p ? JSON.parse(p) : [];
+  }catch(e){ produits = []; }
+  try{
+    const v = localStorage.getItem('cv-ventes');
+    ventes = v ? JSON.parse(v) : [];
+  }catch(e){ ventes = []; }
+  try{
+    const n = localStorage.getItem('cv-boutique-nom');
+    boutiqueNom = n || "Ma boutique";
+  }catch(e){ boutiqueNom = "Ma boutique"; }
+  document.getElementById('boutique-nom').value = boutiqueNom;
+  render();
+}
+
+function saveProduits(){
+  try{ localStorage.setItem('cv-produits', JSON.stringify(produits)); }
+  catch(e){ console.error('Erreur de sauvegarde du stock', e); }
+}
+function saveVentes(){
+  try{ localStorage.setItem('cv-ventes', JSON.stringify(ventes)); }
+  catch(e){ console.error('Erreur de sauvegarde des ventes', e); }
+}
+
+document.getElementById('boutique-nom').addEventListener('change', (e)=>{
+  boutiqueNom = e.target.value || "Ma boutique";
+  try{ localStorage.setItem('cv-boutique-nom', boutiqueNom); }catch(err){}
+});
+
+const achatInput = document.getElementById('p-achat');
+const venteInput = document.getElementById('p-vente');
+function updateLiveBenef(){
+  const a = Number(achatInput.value) || 0;
+  const v = Number(venteInput.value) || 0;
+  const b = v - a;
+  const el = document.getElementById('live-benef');
+  el.textContent = fmt(b);
+  el.style.color = b < 0 ? 'var(--red)' : 'var(--gold)';
+}
+achatInput.addEventListener('input', updateLiveBenef);
+venteInput.addEventListener('input', updateLiveBenef);
+
+document.getElementById('stats-tabs').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-period]');
+  if(!btn) return;
+  statPeriod = btn.dataset.period;
+  render();
+});
+
+document.getElementById('btn-export').addEventListener('click', exportCSV);
+
+document.getElementById('btn-reset').addEventListener('click', ()=>{
+  const confirme = confirm("Supprimer tout le stock et tout l'historique des ventes ? Cette action est définitive.");
+  if(!confirme) return;
+  produits = [];
+  ventes = [];
+  openSellId = null;
+  saveProduits();
+  saveVentes();
+  render();
+});
+
+document.getElementById('form-produit').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const nom = document.getElementById('p-nom').value.trim();
+  const achat = Number(document.getElementById('p-achat').value);
+  const vente = Number(document.getElementById('p-vente').value);
+  const qte = Number(document.getElementById('p-qte').value);
+  const errEl = document.getElementById('form-error');
+
+  if(!nom || !achat || achat < 0 || !vente || vente < 0 || !qte || qte < 1){
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  produits.unshift({
+    id: 'p_' + Date.now(),
+    nom, achat, vente, qte
+  });
+  saveProduits();
+  e.target.reset();
+  updateLiveBenef();
+  render();
+});
+
+function toggleSell(id){
+  openSellId = (openSellId === id) ? null : id;
+  render();
+}
+
+async function confirmSell(id){
+  const produit = produits.find(p => p.id === id);
+  if(!produit) return;
+  const qteInput = document.getElementById('sell-qte-' + id);
+  const prixInput = document.getElementById('sell-prix-' + id);
+  const errEl = document.getElementById('sell-error-' + id);
+
+  const qteVendue = Number(qteInput.value);
+  const prixReel = Number(prixInput.value);
+
+  if(!qteVendue || qteVendue < 1 || qteVendue > produit.qte || !prixReel || prixReel < 0){
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const benefice = (prixReel - produit.achat) * qteVendue;
+
+  ventes.unshift({
+    id: 'v_' + Date.now(),
+    produitNom: produit.nom,
+    qte: qteVendue,
+    prixVente: prixReel,
+    achat: produit.achat,
+    benefice,
+    date: new Date().toISOString()
+  });
+
+  produit.qte -= qteVendue;
+  if(produit.qte <= 0){
+    produits = produits.filter(p => p.id !== id);
+  }
+
+  saveProduits();
+  saveVentes();
+  openSellId = null;
+  render();
+}
+
+async function deleteProduit(id){
+  produits = produits.filter(p => p.id !== id);
+  saveProduits();
+  render();
+}
+
+function dateFr(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'}) + ' ' + d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+}
+
+function render(){
+  const totalBenef = ventes.reduce((s, v) => s + v.benefice, 0);
+  const heroVal = document.getElementById('hero-total');
+  heroVal.textContent = fmt(totalBenef);
+  heroVal.classList.toggle('neg', totalBenef < 0);
+
+  const potentielStock = produits.reduce((s, p) => s + (p.vente - p.achat) * p.qte, 0);
+  const heroPot = document.getElementById('hero-potentiel');
+  heroPot.textContent = fmt(potentielStock);
+  heroPot.style.color = potentielStock < 0 ? 'var(--red)' : 'var(--gold)';
+
+  const totalQteVendue = ventes.reduce((s, v) => s + v.qte, 0);
+  document.getElementById('hero-qte-vendue').textContent = totalQteVendue;
+  document.getElementById('hero-count').textContent = ventes.length;
+
+  document.getElementById('stock-count').textContent = '(' + produits.length + ')';
+  document.getElementById('ventes-count').textContent = '(' + ventes.length + ')';
+
+  document.querySelectorAll('#stats-tabs button').forEach(b => {
+    b.classList.toggle('active', b.dataset.period === statPeriod);
+  });
+  const ventesPeriode = ventes.filter(v => inPeriod(v.date, statPeriod));
+  const benefPeriode = ventesPeriode.reduce((s, v) => s + v.benefice, 0);
+  document.getElementById('stat-benef').textContent = fmt(benefPeriode);
+  document.getElementById('stat-count-ventes').textContent = ventesPeriode.length + ' vente(s)';
+
+  const qteParProduit = {};
+  ventesPeriode.forEach(v => { qteParProduit[v.produitNom] = (qteParProduit[v.produitNom] || 0) + v.qte; });
+  const bestEntry = Object.entries(qteParProduit).sort((a,b) => b[1]-a[1])[0];
+  document.getElementById('stat-best').textContent = bestEntry ? bestEntry[0] : '—';
+  document.getElementById('stat-best-qte').textContent = bestEntry ? (bestEntry[1] + ' unité(s) vendue(s)') : 'Aucune vente sur la période';
+
+  const lowStockItems = produits.filter(p => p.qte <= LOW_STOCK);
+  const alertEl = document.getElementById('alert-stock');
+  if(lowStockItems.length > 0){
+    alertEl.style.display = 'block';
+    alertEl.textContent = lowStockItems.length === 1
+      ? '1 produit en stock faible : ' + lowStockItems[0].nom
+      : lowStockItems.length + ' produits en stock faible : ' + lowStockItems.map(p => p.nom).join(', ');
+  } else {
+    alertEl.style.display = 'none';
+  }
+
+  const stockList = document.getElementById('stock-list');
+  if(produits.length === 0){
+    stockList.innerHTML = '<div class="empty">Aucun produit en stock. Ajoute ton premier produit ci-dessus.</div>';
+  } else {
+    stockList.innerHTML = produits.map(p => {
+      const benefUnit = p.vente - p.achat;
+      const benefPotentiel = benefUnit * p.qte;
+      const sellOpen = openSellId === p.id;
+      return `
+        <div class="ledger-row">
+          <div class="ledger-top">
+            <span class="ledger-name">${escapeHtml(p.nom)}</span>
+            <span class="ledger-qty">${p.qte} en stock${p.qte <= LOW_STOCK ? '<span class="badge-low">Stock faible</span>' : ''}</span>
+          </div>
+          <div class="ledger-mid">
+            <span>Achat ${fmt(p.achat)} → Vente ${fmt(p.vente)}</span>
+            <span class="ledger-benef">+${fmt(benefUnit)}/u</span>
+          </div>
+          <div class="ledger-mid">
+            <span>Bénéfice potentiel du lot</span>
+            <span class="ledger-benef">${fmt(benefPotentiel)}</span>
+          </div>
+          <div class="ledger-actions">
+            <button class="btn-sell" onclick="toggleSell('${p.id}')">${sellOpen ? 'Annuler' : 'Enregistrer une vente'}</button>
+            <button class="btn-del" onclick="deleteProduit('${p.id}')">Retirer</button>
+          </div>
+          ${sellOpen ? `
+          <div class="sell-panel">
+            <div class="row2">
+              <div class="field">
+                <label>Quantité vendue</label>
+                <input type="number" id="sell-qte-${p.id}" min="1" max="${p.qte}" value="1">
+              </div>
+              <div class="field">
+                <label>Prix de vente réel</label>
+                <input type="number" id="sell-prix-${p.id}" min="0" value="${p.vente}">
+              </div>
+            </div>
+            <div class="error" id="sell-error-${p.id}">Vérifie la quantité (max ${p.qte}) et le prix.</div>
+            <button onclick="confirmSell('${p.id}')">Confirmer la vente</button>
+          </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  const ventesList = document.getElementById('ventes-list');
+  if(ventes.length === 0){
+    ventesList.innerHTML = '<div class="empty">Aucune vente enregistrée pour le moment.</div>';
+  } else {
+    ventesList.innerHTML = ventes.slice(0, 30).map(v => `
+      <div class="sale-row">
+        <div class="sale-left">
+          <div class="name">${escapeHtml(v.produitNom)} × ${v.qte}</div>
+          <div class="date">${dateFr(v.date)}</div>
+        </div>
+        <div class="sale-right">
+          <div>${fmt(v.prixVente)}/u</div>
+          <div class="benef">+${fmt(v.benefice)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+loadAll();
+</script>
+</body>
+</html>
